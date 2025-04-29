@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui">
+    <title>游戏类型分析 - Steam游戏数据分析</title>
+    <meta content="Steam游戏数据分析与可视化" name="description">
+
+    <link href="/static/css/bootstrap-datepicker.min.css" rel="stylesheet">
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet" type="text/css">
+    <link href="/static/css/metismenu.min.css" rel="stylesheet" type="text/css">
+    <link href="/static/css/icons.css" rel="stylesheet" type="text/css">
+    <link href="/static/css/style.css" rel="stylesheet" type="text/css">
+    <link href="/static/css/game-style.css" rel="stylesheet" type="text/css">
+
+    <!-- 添加Chart.js库 -->
+        <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+</head>
+
+<body>
+
+<div class="header-bg">
+    <!-- Navigation Bar-->
+    <header id="topnav">
+        <div class="topbar-main">
+            <div class="container-fluid">
+
+                <!-- Logo-->
+                <div>
+                    <a href="/home" class="logo">
+                        <img src="/static/picture/logo-dark.png" class="logo-lg" alt="" height="22">
+                    </a>
+                </div>
+                <!-- End Logo-->
+
+                <div class="menu-extras topbar-custom navbar p-0">
+                    <ul class="navbar-right ml-auto list-inline float-right mb-0">
+                        <li class="dropdown notification-list list-inline-item">
+                            <div class="dropdown notification-list nav-pro-img">
+                                <a class="dropdown-toggle nav-link arrow-none waves-effect nav-user"
+                                   data-toggle="dropdown" href="#" role="button" aria-haspopup="false"
+                                   aria-expanded="false">
+                                    {{ username }}
+                                </a>
+                                <div class="dropdown-menu dropdown-menu-right dropdown-menu-animated profile-dropdown">
+                                    <div class="dropdown-divider"></div>
+                                    <a class="dropdown-item text-danger" href="/logout"><i
+                                            class="mdi mdi-power text-danger"></i> Logout</a>
+                                </div>
+                            </div>
+                        </li>
+
+                        <li class="menu-item dropdown notification-list list-inline-item">
+                            <!-- Mobile menu toggle-->
+                            <a class="navbar-toggle nav-link">
+                                <div class="lines">
+                                    <span></span>
+                                    <span></span>
+                                    <span></span>
+                                </div>
+                            </a>
+                            <!-- End mobile menu toggle-->
+                        </li>
+                    </ul>
+                </div>
+                <!-- end menu-extras -->
+
+                <div class="clearfix"></div>
+
+            </div>
+            <!-- end container -->
+        </div>
+        <!-- end topbar-main -->
+
+        <!-- start content -->
+        <div class="bg-dark">
+            <div class="container-fluid">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <div class="page-title-box">
+                            <h4 class="page-title">游戏类型分析</h4>
+                            <ol class="breadcrumb">
+                                <li class="breadcrumb-item"><a href="/home">首页</a></li>
+                                <li class="breadcrumb-item active">游戏类型分析</li>
+                            </ol>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="float-right d-none d-md-block app-datepicker">
+                            <input type="text" class="form-control" data-date-format="MM dd, yyyy" readonly="readonly"
+                                   id="datepicker">
+                            <i class="mdi mdi-chevron-down mdi-drop"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row top-content">
+                    <div class="col-sm-6 col-xl-3">
+                        <div class="row align-items-center p-1">
+                            <div class="col-lg-6">
+                                <h5 class="font-16 text-white">热门游戏类型</h5>
+                                <h4 class="text-info pt-1 mb-0" style="font-size: 20px">{{ most_common_type }}</h4>
+                            </div>
+                            <div class="col-lg-6">
+                                <div id="chart1"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-6 col-xl-3">
+                        <div class="row align-items-center p-1">
+                            <div class="col-lg-6">
+                                <h5 class="font-16 text-white">折扣最高游戏</h5>
+                                <h4 class="text-warning pt-1 mb-0" style="font-size: 20px">{{ most_discount_game }}</h4>
+                            </div>
+                            <div class="col-lg-6">
+                                <div id="chart2"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-6 col-xl-3">
+                        <div class="row align-items-center p-1">
+                            <div class="col-lg-6">
+                                <h5 class="font-16 text-white">用户数量</h5>
+                                <h4 class="text-primary pt-1 mb-0" style="font-size: 20px">{{ numbers_of_users }}</h4>
+                            </div>
+                            <div class="col-lg-6">
+                                <div id="chart3"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-6 col-xl-3">
+                        <div class="row align-items-center p-1">
+                            <div class="col-lg-6">
+                                <h5 class="font-16 text-white">游戏总数</h5>
+                                <h4 class="text-danger pt-1 mb-0" style="font-size: 20px">{{ numbers_of_games }}</h4>
+                            </div>
+                            <div class="col-lg-6">
+                                <div id="chart4"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- end content -->
+
+        <!-- MENU Start -->
+        <div class="navbar-custom">
+            <div class="container-fluid">
+                <div id="navigation">
+                    <!-- Navigation Menu-->
+                    <ul class="navigation-menu">
+                        <li class="has-submenu">
+                            <a href="/home"><i class="dripicons-meter"></i> 首页</a>
+                        </li>
+
+                        <li class="has-submenu">
+                            <a href="#"><i class="dripicons-view-thumb"></i> 游戏分析</a>
+                            <ul class="submenu">
+                                <li>
+                                    <a href="/price_analysis">价格分析</a>
+                                </li>
+                                <li>
+                                    <a href="/game_type_analysis">游戏类型分析</a>
+                                </li>
+                                <li>
+                                    <a href="/review_analysis">评价分析</a>
+                                </li>
+                                <li>
+                                    <a href="/publisher_analysis">发行商分析</a>
+                                </li>
+                            </ul>
+                        </li>
+
+                        <li class="has-submenu">
+                            <a href="#"><i class="dripicons-graph-bar"></i>词云图</a>
+                            <ul class="submenu">
+                                <li><a href="/games_wordcloud">游戏名词云</a></li>
+                                <li><a href="/description_wordcloud">描述词云</a></li>
+                            </ul>
+                        </li>
+
+                        <li class="has-submenu">
+                            <a href="/game_recommendation"><i class="dripicons-to-do"></i>游戏推荐</a>
+                        </li>
+                    </ul>
+                    <!-- End navigation menu -->
+                </div>
+                <!-- end #navigation -->
+            </div>
+            <!-- end container -->
+        </div>
+        <!-- end navbar-custom -->
+    </header>
+    <!-- End Navigation Bar-->
+</div>
+<!-- header-bg -->
+
+<div class="wrapper">
+    <div class="container-fluid">
+        <!-- 游戏类型分析内容 -->
+        <div class="row">
+            <!-- 左侧：游戏类型分布饼图 -->
+            <div class="col-xl-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="mt-0 header-title mb-4">游戏类型分布</h4>
+                        <div class="text-center">
+                            <div class="chart-container" style="position: relative; height:400px; width:100%">
+                                <canvas id="gameTypePieChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 右侧：游戏类型详细数据 -->
+            <div class="col-xl-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="mt-0 header-title mb-4">游戏类型详细数据</h4>
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead>
+                                <tr>
+                                    <th scope="col">游戏类型</th>
+                                    <th scope="col">游戏数量</th>
+                                    <th scope="col">占比</th>
+                                    <th scope="col">平均价格</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for type_data in game_types_data %}
+                                    <tr>
+                                        <td>{{ type_data.type }}</td>
+                                        <td>{{ type_data.count }}</td>
+                                        <td>{{ type_data.percentage }}%</td>
+                                        <td>${{ type_data.avg_price }}</td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 第二行：游戏类型趋势和组合分析 -->
+        <div class="row">
+            <!-- 左侧：游戏类型随时间变化趋势 -->
+            <div class="col-xl-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="mt-0 header-title mb-4">游戏类型流行趋势</h4>
+                        <div class="chart-container" style="position: relative; height:400px; width:100%">
+                            <canvas id="gameTypeTrendChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 右侧：游戏类型组合分析 -->
+            <div class="col-xl-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="mt-0 header-title mb-4">游戏类型组合分析</h4>
+                        <div class="chart-container" style="position: relative; height:400px; width:100%">
+                            <canvas id="gameTypeCombinationChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 第三行：游戏类型与价格、评价关系 -->
+        <div class="row">
+            <div class="col-xl-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="mt-0 header-title mb-4">游戏类型与价格、评价关系</h4>
+                        <div class="chart-container" style="position: relative; height:400px; width:100%">
+                            <canvas id="gameTypeRelationChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- end container-fluid -->
+</div>
+<!-- end wrapper -->
+
+<!-- Footer -->
+<footer class="footer">
+    Copyright &copy; 2024 Steam游戏数据分析平台
+</footer>
+<!-- End Footer -->
+
+<!-- jQuery  -->
+<script src="/static/js/jquery.min.js"></script>
+<script src="/static/js/bootstrap.bundle.min.js"></script>
+<script src="/static/js/jquery.slimscroll.js"></script>
+<script src="/static/js/waves.min.js"></script>
+
+<!-- Plugins js -->
+<script src="/static/js/apexcharts.min.js"></script>
+<script src="/static/js/bootstrap-datepicker.min.js"></script>
+<script src="/static/js/raphael.min.js"></script>
+
+<!-- App js -->
+<script src="/static/js/app.js"></script>
+
+<!-- 游戏类型分析图表脚本 -->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // 游戏类型分布饼图
+        const pieCtx = document.getElementById('gameTypePieChart').getContext('2d');
+        const pieChart = new Chart(pieCtx, {
+            type: 'pie',
+            data: {
+                labels: {{ game_types_labels|safe }},
+                datasets: [{
+                    data: {{ game_types_counts|safe }},
+                    backgroundColor: [
+                        '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF',
+                        '#FF9F40', '#8AC249', '#EA5545', '#F46A9B', '#EF9B20',
+                        '#EDBF33', '#87BC45', '#27AEEF', '#B33DC6', '#5D69B1'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'right',
+                    },
+                    title: {
+                        display: true,
+                        text: '游戏类型分布'
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function (context) {
+                                const label = context.label || '';
+                                const value = context.raw || 0;
+                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                const percentage = Math.round((value / total) * 100);
+                                return `${label}: ${value} (${percentage}%)`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // 游戏类型流行趋势图
+        const trendCtx = document.getElementById('gameTypeTrendChart').getContext('2d');
+        const trendChart = new Chart(trendCtx, {
+            type: 'line',
+            data: {
+                labels: {{ trend_labels|safe }},
+                datasets: {{ trend_datasets|safe }}
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: '游戏类型流行趋势'
+                    },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false,
+                    }
+                },
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: '发行年份'
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: '游戏数量'
+                        },
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        // 游戏类型组合分析图
+        const combinationCtx = document.getElementById('gameTypeCombinationChart').getContext('2d');
+        const combinationChart = new Chart(combinationCtx, {
+            type: 'bar',
+            data: {
+                labels: {{ combination_labels|safe }},
+                datasets: [{
+                    label: '组合出现次数',
+                    data: {{ combination_counts|safe }},
+                    backgroundColor: '#36A2EB',
+                    borderColor: '#2980B9',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: '常见游戏类型组合'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: '出现次数'
+                        }
+                    }
+                }
+            }
+        });
+
+        // 游戏类型与价格、评价关系图
+        const relationCtx = document.getElementById('gameTypeRelationChart').getContext('2d');
+        const relationChart = new Chart(relationCtx, {
+            type: 'scatter',
+            data: {
+                datasets: {{ relation_datasets|safe }}
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: '游戏类型与价格、评价关系'
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function (context) {
+                                return `${context.dataset.label}: $${context.raw.x.toFixed(2)}, 评分: ${context.raw.y.toFixed(1)}`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: '平均价格 ($)'
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: '平均评分'
+                        }
+                    }
+                }
+            }
+        });
+    });
+</script>
+
+</body>
+</html>

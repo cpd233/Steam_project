@@ -103,5 +103,83 @@ def home():
                            )
 
 
+@app.route('/tabledata', methods=['GET', 'POST'])
+def tabledata():
+    username = session['username']
+
+    # 获取用户数量
+    numbers_of_users = len(get_users())
+
+    # 从数据库加载所有游戏
+    game_list = get_all_games_data()
+
+    # 获取总游戏数量
+    numbers_of_games = calculate_total_numbers_of_games()
+    print(numbers_of_games)
+
+    # 获取最高折扣游戏
+    stats = get_game_stats()
+    most_discount_game = stats['most_discounted_title']
+
+    # 获取最常见游戏类型
+    most_common_type = stats['most_common_type']
+
+    return render_template('tabledata.html',
+                           username=username,
+                           game_list=game_list,
+                           numbers_of_users=numbers_of_users,
+                           numbers_of_games=numbers_of_games,
+                           most_discount_game=most_discount_game,
+                           most_common_type=most_common_type
+                           )
+
+
+# 游戏类型分析路由
+@app.route('/game_type_analysis')
+def game_type_analysis():
+    username = session.get('username', '')
+
+    # 获取用户数量
+    numbers_of_users = len(get_users())
+
+    # 获取总游戏数量
+    numbers_of_games = calculate_total_numbers_of_games()
+    print(numbers_of_games)
+
+    # 获取最高折扣游戏
+    stats = get_game_stats()
+    most_discount_game = stats['most_discounted_title']
+
+    # 获取最常见游戏类型
+    most_common_type = stats['most_common_type']
+
+    # 获取游戏类型分析数据
+    game_types_data, game_types_labels, game_types_counts = get_game_types_distribution()
+
+    # 获取游戏类型趋势数据
+    trend_labels, trend_datasets = get_game_types_trend()
+
+    # 获取游戏类型组合数据
+    combination_labels, combination_counts = get_game_types_combinations()
+
+    # 获取游戏类型与价格、评价关系数据
+    relation_datasets = get_game_types_price_rating_relation()
+
+    return render_template('game_type_visualization.html',
+                           numbers_of_users=numbers_of_users,
+                           numbers_of_games=numbers_of_games,
+                           most_discount_game=most_discount_game,
+                           most_common_type=most_common_type,
+                           username=username,
+                           game_types_data=game_types_data,
+                           game_types_labels=json.dumps(game_types_labels),
+                           game_types_counts=json.dumps(game_types_counts),
+                           trend_labels=json.dumps(trend_labels),
+                           trend_datasets=json.dumps(trend_datasets),
+                           combination_labels=json.dumps(combination_labels),
+                           combination_counts=json.dumps(combination_counts),
+                           relation_datasets=json.dumps(relation_datasets))
+
+
 if __name__ == '__main__':
     app.run()

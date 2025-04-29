@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui">
+    <title>Steam游戏数据分析 - 游戏列表</title>
+    <meta content="Steam游戏数据分析与可视化平台" name="description">
+
+    <link href="/static/css/bootstrap-datepicker.min.css" rel="stylesheet">
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet" type="text/css">
+    <link href="/static/css/metismenu.min.css" rel="stylesheet" type="text/css">
+    <link href="/static/css/icons.css" rel="stylesheet" type="text/css">
+    <link href="/static/css/style.css" rel="stylesheet" type="text/css">
+    <link href="/static/css/game-style.css" rel="stylesheet" type="text/css">
+
+    <!-- 添加DataTables CSS -->
+    <link href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap4.min.css" rel="stylesheet" type="text/css">
+    <link href="https://cdn.datatables.net/responsive/2.2.9/css/responsive.bootstrap4.min.css" rel="stylesheet"
+          type="text/css">
+
+    <style>
+        .dataTables_wrapper {
+            padding: 20px 0;
+        }
+
+        .game-icon-small {
+            width: 50px;
+            height: 50px;
+            object-fit: contain;
+            border-radius: 4px;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        .badge-discount {
+            background-color: #28a745;
+            color: white;
+            font-weight: bold;
+        }
+
+        .original-price {
+            text-decoration: line-through;
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+
+        .current-price {
+            font-weight: bold;
+            color: #28a745;
+        }
+
+        .game-type-badge {
+            display: inline-block;
+            margin: 2px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            background-color: #f0f0f0;
+            font-size: 0.8em;
+        }
+
+        .table-actions {
+            white-space: nowrap;
+        }
+
+        .table-actions .btn {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.875rem;
+            margin-right: 5px;
+        }
+
+        .dataTables_filter {
+            margin-bottom: 15px;
+        }
+
+        .dataTables_filter input {
+            padding: 6px 12px;
+            border-radius: 4px;
+            border: 1px solid #ced4da;
+        }
+
+        .pagination {
+            margin-top: 15px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="header-bg">
+    <!-- Navigation Bar-->
+    <header id="topnav">
+        <div class="topbar-main">
+            <div class="container-fluid">
+
+                <!-- Logo-->
+                <div>
+                    <a href="/home" class="logo">
+                        <img src="/static/picture/logo-dark.png" class="logo-lg" alt="" height="22">
+                    </a>
+                </div>
+                <!-- End Logo-->
+
+                <div class="menu-extras topbar-custom navbar p-0">
+
+                    <!-- Search input -->
+                    <div class="search-wrap" id="search-wrap">
+                        <div class="search-bar">
+                            <input class="search-input" type="search" placeholder="搜索游戏...">
+                            <a href="#" class="close-search toggle-search" data-target="#search-wrap">
+                                <i class="mdi mdi-close-circle"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                    <ul class="navbar-right ml-auto list-inline float-right mb-0">
+                        <li class="dropdown notification-list list-inline-item">
+                            <div class="dropdown notification-list nav-pro-img">
+                                <a class="dropdown-toggle nav-link arrow-none waves-effect nav-user"
+                                   data-toggle="dropdown" href="#" role="button" aria-haspopup="false"
+                                   aria-expanded="false">
+                                    {{ username }}
+                                </a>
+                                <div class="dropdown-menu dropdown-menu-right dropdown-menu-animated profile-dropdown">
+                                    <div class="dropdown-divider"></div>
+                                    <a class="dropdown-item text-danger" href="/logout"><i
+                                            class="mdi mdi-power text-danger"></i> Log out</a>
+                                </div>
+                            </div>
+                        </li>
+
+                        <li class="menu-item dropdown notification-list list-inline-item">
+                            <!-- Mobile menu toggle-->
+                            <a class="navbar-toggle nav-link">
+                                <div class="lines">
+                                    <span></span>
+                                    <span></span>
+                                    <span></span>
+                                </div>
+                            </a>
+                            <!-- End mobile menu toggle-->
+                        </li>
+                    </ul>
+                </div>
+                <!-- end menu-extras -->
+
+                <div class="clearfix"></div>
+
+            </div>
+            <!-- end container -->
+        </div>
+        <!-- end topbar-main -->
+
+        <!-- start content -->
+        <div class="bg-dark">
+            <div class="container-fluid">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <div class="page-title-box">
+                            <h4 class="page-title">Game data analysis based on Steam
+                            </h4>
+                            <ol class="breadcrumb">
+                                <li class="breadcrumb-item"><a href="/home">Home Page</a></li>
+                                <li class="breadcrumb-item active">Game List</li>
+                            </ol>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="float-right d-none d-md-block app-datepicker">
+                            <input type="text" class="form-control" data-date-format="MM dd, yyyy" readonly="readonly"
+                                   id="datepicker">
+                            <i class="mdi mdi-chevron-down mdi-drop"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row top-content">
+                    <div class="col-sm-6 col-xl-3">
+                        <div class="row align-items-center p-1">
+                            <div class="col-lg-6">
+                                <h5 class="font-16 text-white">Popular game type</h5>
+                                <h4 class="text-info pt-1 mb-0" style="font-size: 20px">{{ most_common_type }}</h4>
+                            </div>
+                            <div class="col-lg-6">
+                                <div id="chart1"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-6 col-xl-3">
+                        <div class="row align-items-center p-1">
+                            <div class="col-lg-6">
+                                <h5 class="font-16 text-white">Most discounted game</h5>
+                                <h4 class="text-warning pt-1 mb-0" style="font-size: 20px">{{ most_discount_game }}</h4>
+                            </div>
+                            <div class="col-lg-6">
+                                <div id="chart2"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-6 col-xl-3">
+                        <div class="row align-items-center p-1">
+                            <div class="col-lg-6">
+                                <h5 class="font-16 text-white">The number of users</h5>
+                                <h4 class="text-primary pt-1 mb-0" style="font-size: 20px">{{ numbers_of_users }}</h4>
+                            </div>
+                            <div class="col-lg-6">
+                                <div id="chart3"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-6 col-xl-3">
+                        <div class="row align-items-center p-1">
+                            <div class="col-lg-6">
+                                <h5 class="font-16 text-white">Number of games</h5>
+                                <h4 class="text-danger pt-1 mb-0" style="font-size: 20px">{{ numbers_of_games }}</h4>
+                            </div>
+                            <div class="col-lg-6">
+                                <div id="chart4"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- end content -->
+
+        <!-- MENU Start -->
+        <div class="navbar-custom">
+            <div class="container-fluid">
+                <div id="navigation">
+                    <!-- Navigation Menu-->
+                    <ul class="navigation-menu">
+                        <li class="has-submenu">
+                            <a href="/home"><i class="dripicons-meter"></i> Home Page</a>
+                        </li>
+
+                        <li class="has-submenu">
+                            <a href="/tabledata"><i class="dripicons-briefcase"></i> Game List</a>
+                        </li>
+
+
+                        <li class="has-submenu">
+                            <a href="#"><i class="dripicons-view-thumb"></i> Game Analysis</a>
+                            <ul class="submenu">
+                                <li>
+                                    <a href="/price_analysis">Price</a>
+                                </li>
+                                <li>
+                                    <a href="/game_type_analysis">Game Type</a>
+                                </li>
+                                <li>
+                                    <a href="/review_analysis">Review</a>
+                                </li>
+                                <li>
+                                    <a href="/publisher_analysis">Firm/Publisher</a>
+                                </li>
+                            </ul>
+                        </li>
+
+                        <li class="has-submenu">
+                            <a href="#"><i class="dripicons-graph-bar"></i>Word Cloud Diagram</a>
+                            <ul class="submenu">
+                                <li><a href="/games_wordcloud">Games</a></li>
+                                <li><a href="/description_wordcloud">Description</a></li>
+                            </ul>
+                        </li>
+
+                        <li class="has-submenu">
+                            <a href="/game_recommendation"><i class="dripicons-to-do"></i>Recommended Games</a>
+                        </li>
+                    </ul>
+                    <!-- End navigation menu -->
+                </div>
+                <!-- end #navigation -->
+            </div>
+            <!-- end container -->
+        </div>
+        <!-- end navbar-custom -->
+    </header>
+    <!-- End Navigation Bar-->
+</div>
+<!-- header-bg -->
+
+<div class="wrapper">
+    <div class="container-fluid">
+        <!-- 游戏数据表格 -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="mt-0 header-title">Game Data List</h4>
+
+                        <div class="row mb-3">
+
+                        </div>
+
+                        <div class="table-responsive">
+                            <table id="game-datatable" class="table table-striped table-bordered dt-responsive nowrap"
+                                   style="border-collapse: collapse; border-spacing: 0; width: 100%;">
+                                <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>游戏名称</th>
+                                    <th>图标</th>
+                                    <th>发布时间</th>
+                                    <th>评价</th>
+                                    <th>现价</th>
+                                    <th>开发商</th>
+                                    <th>Types</th>
+                                    <th>视频预览</th>
+                                    <th>操作</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for game in game_list %}
+                                    <tr>
+                                        <td>{{ game.id }}</td>
+                                        <td>{{ game.title }}</td>
+                                        <td>
+                                            <img src="{{ game.icon }}" alt="{{ game.title }}" class="game-icon-small"
+                                                 onerror="this.src='https://via.placeholder.com/50x50?text=游戏'">
+                                        </td>
+                                        <td>{{ game.time }}</td>
+                                        <td>{{ game.evaluate }}</td>
+                                        <td>
+                                            <span class="current-price">¥{{ game.current_price }}</span>
+                                        </td>
+                                        <td>{{ game.firm }}</td>
+                                        <td>
+                                            {% if game.types %}
+                                                {% if game.types is string %}
+                                                    <span class="game-type-badge">{{ game.types }}</span>
+                                                {% else %}
+                                                    {% for type in game.types %}
+                                                        <span class="game-type-badge">{{ type }}</span>
+                                                    {% endfor %}
+                                                {% endif %}
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if game.video %}
+                                                <button type="button" class="btn btn-sm btn-primary video-preview-btn"
+                                                        data-toggle="modal" data-target="#videoModal"
+                                                        data-video="{{ game.video }}">
+                                                    <i class="mdi mdi-play-circle-outline"></i> 预览
+                                                </button>
+                                            {% else %}
+                                                <span>无视频</span>
+                                            {% endif %}
+                                        </td>
+                                        <td class="table-actions">
+                                            <a href="{{ game.detaillink }}" target="_blank"
+                                               class="btn btn-primary btn-sm" title="Steam页面">
+                                                <i class="mdi mdi-steam"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- end row -->
+    </div>
+    <!-- end container-fluid -->
+</div>
+<!-- end wrapper -->
+
+<!-- 视频预览模态框 -->
+<div class="modal fade" id="videoModal" tabindex="-1" role="dialog" aria-labelledby="videoModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="videoModalLabel">游戏视频预览</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="embed-responsive embed-responsive-16by9">
+                    <iframe class="embed-responsive-item" src="/placeholder.svg" id="videoFrame" allowfullscreen></iframe>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer class="footer">
+    Copyright &copy; 2024 Steam游戏数据分析平台
+</footer>
+<!-- End Footer -->
+
+<!-- jQuery  -->
+<script src="/static/js/jquery.min.js"></script>
+<script src="/static/js/bootstrap.bundle.min.js"></script>
+<script src="/static/js/jquery.slimscroll.js"></script>
+<script src="/static/js/waves.min.js"></script>
+
+<!-- Plugins js -->
+<script src="/static/js/apexcharts.min.js"></script>
+<script src="/static/js/bootstrap-datepicker.min.js"></script>
+
+<!-- DataTables js -->
+<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap4.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.9/js/responsive.bootstrap4.min.js"></script>
+
+<!-- 导出功能插件 -->
+<script src="https://cdn.datatables.net/buttons/2.2.2/js/dataTables.buttons.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.html5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.print.min.js"></script>
+
+<!-- App js -->
+<script src="/static/js/app.js"></script>
+
+<!-- 游戏数据表格初始化脚本 -->
+<script>
+    $(document).ready(function () {
+        // 初始化DataTable
+        var gameTable = $('#game-datatable').DataTable({
+            responsive: true,
+            language: {
+                url: "//cdn.datatables.net/plug-ins/1.11.5/i18n/zh.json"
+            },
+            pageLength: 10,
+            lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "全部"]],
+            columnDefs: [
+                {responsivePriority: 1, targets: [1, 2, 8]}, // 优先显示的列
+                {responsivePriority: 2, targets: [6, 7, 15]},
+                {orderable: false, targets: [2, 15]}, // 不可排序的列
+                {width: "50px", targets: 2}, // 图标列宽度
+                {width: "120px", targets: 15} // 操作列宽度
+            ]
+        });
+
+        // 导出CSV
+        $('#export-csv').on('click', function () {
+            var buttons = $.fn.dataTable.Buttons(gameTable, {
+                buttons: [
+                    {
+                        extend: 'csv',
+                        text: 'CSV格式',
+                        title: 'Steam游戏数据_' + new Date().toISOString().slice(0, 10),
+                        exportOptions: {
+                            columns: ':not(:last-child)' // 排除操作列
+                        }
+                    }
+                ]
+            });
+            buttons.container().find('.buttons-csv').trigger('click');
+        });
+
+        // 导出Excel
+        $('#export-excel').on('click', function () {
+            var buttons = $.fn.dataTable.Buttons(gameTable, {
+                buttons: [
+                    {
+                        extend: 'excel',
+                        text: 'Excel格式',
+                        title: 'Steam游戏数据_' + new Date().toISOString().slice(0, 10),
+                        exportOptions: {
+                            columns: ':not(:last-child)' // 排除操作列
+                        }
+                    }
+                ]
+            });
+            buttons.container().find('.buttons-excel').trigger('click');
+        });
+
+        // 导出PDF
+        $('#export-pdf').on('click', function () {
+            var buttons = $.fn.dataTable.Buttons(gameTable, {
+                buttons: [
+                    {
+                        extend: 'pdf',
+                        text: 'PDF格式',
+                        title: 'Steam游戏数据_' + new Date().toISOString().slice(0, 10),
+                        exportOptions: {
+                            columns: ':not(:last-child)' // 排除操作列
+                        },
+                        orientation: 'landscape'
+                    }
+                ]
+            });
+            buttons.container().find('.buttons-pdf').trigger('click');
+        });
+
+        // 刷新数据
+        $('#refresh-data').on('click', function () {
+            // 显示加载动画
+            $(this).html('<i class="mdi mdi-refresh mr-1 mdi-spin"></i> 加载中...');
+            $(this).prop('disabled', true);
+
+            // 重新加载页面
+            setTimeout(function () {
+                window.location.reload();
+            }, 1000);
+        });
+    });
+</script>
+
+</body>
+</html>

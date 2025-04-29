@@ -1,0 +1,151 @@
+/* 游戏数据表格样式 */
+.dataTables_wrapper {
+  padding: 20px 0;
+}
+
+.game-icon-small {
+  width: 50px;
+  height: 50px;
+  object-fit: contain;
+  border-radius: 4px;
+  background-color: #f0f0f0;
+  padding: 2px;
+  transition: transform 0.2s;
+}
+
+.game-icon-small:hover {
+  transform: scale(1.5);
+  z-index: 10;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+
+.table-responsive {
+  overflow-x: auto;
+}
+
+.current-price {
+  font-weight: bold;
+  color: #28a745;
+}
+
+.game-type-badge {
+  display: inline-block;
+  margin: 2px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background-color: #f0f0f0;
+  font-size: 0.8em;
+  white-space: nowrap;
+}
+
+.table-actions {
+  white-space: nowrap;
+}
+
+.table-actions .btn {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
+  margin-right: 5px;
+}
+
+.dataTables_filter {
+  margin-bottom: 15px;
+}
+
+.dataTables_filter input {
+  padding: 6px 12px;
+  border-radius: 4px;
+  border: 1px solid #ced4da;
+}
+
+.pagination {
+  margin-top: 15px;
+}
+
+/* 表格行悬停效果 */
+.table-hover tbody tr:hover {
+  background-color: rgba(0, 123, 255, 0.05);
+}
+
+/* 表格头部样式 */
+.table thead th {
+  background-color: #f8f9fa;
+  border-bottom: 2px solid #dee2e6;
+  font-weight: 600;
+  color: #495057;
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+  .table-responsive {
+    border: 0;
+  }
+
+  .dataTables_wrapper .row {
+    margin: 0;
+  }
+
+  .dataTables_filter {
+    text-align: left;
+    margin-top: 10px;
+  }
+
+  .dataTables_length {
+    text-align: left;
+  }
+
+  .game-icon-small {
+    width: 40px;
+    height: 40px;
+  }
+
+  .table-actions .btn {
+    padding: 0.2rem 0.4rem;
+    font-size: 0.8rem;
+  }
+}
+
+/* 导出按钮样式 */
+.dt-buttons {
+  margin-bottom: 15px;
+}
+
+.dt-button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.dt-button:hover {
+  background-color: #0069d9;
+}
+
+/* 加载动画 */
+.loading-spinner {
+  display: inline-block;
+  width: 1rem;
+  height: 1rem;
+  border: 0.2em solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: spinner-border .75s linear infinite;
+}
+
+@keyframes spinner-border {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* 添加视频预览按钮样式 */
+.video-preview-btn {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
+}
+
+.video-preview-btn i {
+  margin-right: 3px;
+}

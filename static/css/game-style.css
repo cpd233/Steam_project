@@ -101,3 +101,66 @@
     height: 60px;
   }
 }
+
+
+/* 游戏类型可视化页面样式 */
+.chart-container {
+  position: relative;
+  margin: auto;
+  height: 400px;
+  width: 100%;
+}
+
+.chart-info-card {
+  transition: all 0.3s ease;
+  border-left: 4px solid #007bff;
+  margin-bottom: 15px;
+}
+
+.chart-info-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.type-badge {
+  display: inline-block;
+  padding: 0.25em 0.6em;
+  font-size: 75%;
+  font-weight: 700;
+  line-height: 1;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: baseline;
+  border-radius: 0.25rem;
+  margin-right: 5px;
+  margin-bottom: 5px;
+}
+
+.type-stats {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid #eee;
+}
+
+.type-stat-item {
+  text-align: center;
+}
+
+.type-stat-value {
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.type-stat-label {
+  font-size: 0.8rem;
+  color: #6c757d;
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+  .chart-container {
+    height: 300px;
+  }
+}
